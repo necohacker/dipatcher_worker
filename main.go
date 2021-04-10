@@ -75,7 +75,7 @@ func main() {
 	}
 }
 
-func jobFunc(jobNum int) func () error {
+func jobFunc(jobNum int) func() error {
 	return func() error {
 		log.Printf("num: %d \n", jobNum)
 		return nil
