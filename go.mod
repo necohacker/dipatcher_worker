@@ -1,3 +1,3 @@
-module dispatcher_worker
+module worker
 
 go 1.13
