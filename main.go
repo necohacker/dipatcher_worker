@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"sync"
 )
@@ -48,7 +49,7 @@ func (w *Worker) Wait() {
 	w.wg.Wait()
 }
 
-func (w *Worker) Stop() {
+func (w *Worker) Close() {
 	w.Wait()
 	close(w.jobs)
 }
@@ -58,23 +59,25 @@ func (w *Worker) Error() error {
 }
 
 func main() {
-	// dummy
-	jobs := []uint64{1, 2, 3}
+	jobNums := []int{1, 2, 3, 4, 5}
 	maxWorkerSize := runtime.NumCPU() - 1
+	fmt.Printf("run on %d threads.\n", maxWorkerSize)
 
 	w := NewWorker(maxWorkerSize)
 	w.Start()
-
-	for _, job := range jobs {
-		jobFunc := func() error {
-			fmt.Println(job)
-			return nil
-		}
-		w.Exec(jobFunc)
+	for _, jobNum := range jobNums {
+		w.Exec(jobFunc(jobNum))
 	}
-	w.Stop()
+	w.Close()
 
 	if w.Error() != nil {
 		panic(w.Error())
+	}
+}
+
+func jobFunc(jobNum int) func () error {
+	return func() error {
+		log.Printf("num: %d \n", jobNum)
+		return nil
 	}
 }
